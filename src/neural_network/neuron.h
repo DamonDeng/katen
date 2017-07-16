@@ -17,6 +17,9 @@ namespace katen{
       int forward();
       int backward();
 
+      int deepForward();
+      int deepBackward();
+
       map<long, Neuron> getAllNextNeuron();
       map<long, Neuron> getAllPrevNeuron();
 

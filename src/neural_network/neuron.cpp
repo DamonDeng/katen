@@ -9,11 +9,10 @@ namespace katen{
       this->id = _genUID();    
     }
 
-    // map<long, Neuron> Neuron::inputNeuronMap; 
-    // map<long, Neuron> Neuron::outputNeuronMap; 
+    
 
     int Neuron::connectFrom(Neuron inputNeuron){
-      this->inputNeuronMap.insert(map<long, Neuron> :: value_type(inputNeuron.getID(), inputNeuron));
+      this->inputNeuronMap.insert(map<long, Neuron>::value_type(inputNeuron.getID(), inputNeuron));
       return 0;
     }
 
@@ -22,7 +21,7 @@ namespace katen{
     }
 
     int Neuron::connectTo(Neuron outputNeuron){
-      this->outputNeuronMap.insert(map<long, Neuron> :: value_type(outputNeuron.getID(), outputNeuron));
+      this->outputNeuronMap.insert(map<long, Neuron>::value_type(outputNeuron.getID(), outputNeuron));
 
       return 0;
     }
@@ -40,6 +39,31 @@ namespace katen{
       cout << "backward in: " << this->id << endl;
       return 0;
     }
+
+    int Neuron::deepForward(){
+      cout << "deep forward in: " << this->id << endl;
+      
+      this->forward();
+      map<long, Neuron>::iterator it;
+      for(it = outputNeuronMap.begin(); it != outputNeuronMap.end(); it++){
+        it->second.deepForward();
+      }
+
+      return 0;
+    }
+
+    int Neuron::deepBackward(){
+      cout << "deep backward in: " << this->id << endl;
+      
+      this->backward();
+      map<long, Neuron>::iterator it;
+      for(it = inputNeuronMap.begin(); it != inputNeuronMap.end(); it++){
+        it->second.deepForward();
+      }
+
+      return 0;
+    }
+
 
     long Neuron::getID(){
       return this->id;
