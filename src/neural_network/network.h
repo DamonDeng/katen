@@ -13,6 +13,8 @@ namespace katen{
       
       int addNeuron(Neuron *p_newNeuron);
       int addNeuronIfNotExist(Neuron *p_newNeuron);
+      
+      map<long, Neuron*> getAllNeuronMap();
 
       int connectNeuron(Neuron *p_sourceNeuron, Neuron *p_targetNeuron);
       int disconnectNeuron(Neuron *p_sourceNeuron, Neuron *p_targetNeuron);
@@ -23,14 +25,19 @@ namespace katen{
       map<long, Neuron*> getAllInputNeurons();
       map<long, Neuron*> getAllOutputNeurons();
 
-
       bool isInTheNetwork(Neuron *p_neuron);
+
+      int updateLayerStructure();
 
     private:
 
       map<long, Neuron*> allNeuronMap;
       map<long, Neuron*> allInputNeuronMap;
       map<long, Neuron*> allOutputNeuronMap;
+
+      bool isLayerStructureDirty;
+
+      vector< vector<Neuron*> > layerStructure;
       
 
   };

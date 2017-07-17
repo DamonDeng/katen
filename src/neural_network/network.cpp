@@ -5,7 +5,7 @@ using namespace std;
 namespace katen{
 
   Network::Network(){
-
+    isLayerStructureDirty = true;
   }
 
   int Network::addNeuronIfNotExist(Neuron *p_newNeuron){
@@ -24,12 +24,16 @@ namespace katen{
     return 0;
   }
 
+  map<long, Neuron*> Network::getAllNeuronMap(){
+    return this->allNeuronMap;
+  }
+
   int Network::connectNeuron(Neuron *p_sourceNeuron, Neuron *p_targetNeuron){
     cout << "connect Neuron" << endl;
     this->addNeuronIfNotExist(p_sourceNeuron);
     this->addNeuronIfNotExist(p_targetNeuron);
-    p_sourceNeuron->connectTo(*p_targetNeuron);
-    p_targetNeuron->connectFrom(*p_sourceNeuron);
+    p_sourceNeuron->connectTo(p_targetNeuron);
+    p_targetNeuron->connectFrom(p_sourceNeuron);
     return 0;
   }
 
@@ -60,6 +64,8 @@ namespace katen{
     return this->allOutputNeuronMap;
   }
 
+
+
   bool Network::isInTheNetwork(Neuron *p_neuron){
     bool result = false;
     map<long,Neuron*>::iterator it;
@@ -69,6 +75,27 @@ namespace katen{
     }else{
       result = true;
     }
+
+    return result;
+  }
+
+  int Network::updateLayerStructure(){
+    //return value, 0 nomal result, 1 has circle;
+    int result = 0;
+
+    cout << "updating Layer Structure" << endl;
+
+    map<long, Neuron*>::iterator it;
+    int tempResult = 0;
+
+    for(it = allInputNeuronMap.begin(); it != allInputNeuronMap.end(); it++){
+      tempResult = it->second->computeLayerNumber(0);
+      if(tempResult == 1){
+        result = 1;
+      }
+    }
+
+    this->isLayerStructureDirty = false;
 
     return result;
   }

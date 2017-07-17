@@ -2,6 +2,7 @@
 #define DAMONDENG_KATEN_NEURON
 
 #include <map>
+#include <vector>
 
 using namespace std;
 
@@ -11,27 +12,32 @@ namespace katen{
     public:
       Neuron();
 
-      int connectFrom(Neuron inputNeuron);
-      int connectTo(Neuron outputNeuron);
+      int connectFrom(Neuron *p_inputNeuron);
+      int connectTo(Neuron *p_outputNeuron);
 
       int forward();
       int backward();
 
-      int deepForward();
-      int deepBackward();
+      int computeLayerNumber(long prevLayerNumber);
+      int resetComputeLayerNumber();
 
-      map<long, Neuron> getAllNextNeuron();
-      map<long, Neuron> getAllPrevNeuron();
+      map<long, Neuron*> getAllNextNeuron();
+      map<long, Neuron*> getAllPrevNeuron();
 
       long getID();
+      long getLayerNumber();
 
     private:
       long id;
-      map<long, Neuron> inputNeuronMap;
-      map<long, Neuron> outputNeuronMap;
+      map<long, Neuron*> inputNeuronMap;
+      map<long, Neuron*> outputNeuronMap;
 
       long _genUID();
       
+      long maxLayerNumber;
+      long confirmLayerNumber;
+
+      vector<long> potentialLayerNumbers;
 
 
   };

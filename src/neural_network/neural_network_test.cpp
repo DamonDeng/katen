@@ -42,7 +42,7 @@ int neuronTest(){
 
     for (int i=0;i<100;i++){
         Neuron testingNeuron = Neuron();
-        p_currentNeuron->connectTo(testingNeuron);
+        p_currentNeuron->connectTo(&testingNeuron);
         p_currentNeuron = &testingNeuron;
         //cout << "the id of the neuron is:" << testingNeuron.getID() << endl;
 
@@ -50,13 +50,13 @@ int neuronTest(){
 
     //currentNeuron = firstNeuron;
 
-    map<long, Neuron> nextNeuron = firstNeuron.getAllNextNeuron();
+    map<long, Neuron*> nextNeuron = firstNeuron.getAllNextNeuron();
     
     cout << "this size of the Map: " << nextNeuron.size() << endl;
 
-     for(map<long, Neuron>::iterator it = nextNeuron.begin(); it != nextNeuron.end(); it++ ){
+     for(map<long, Neuron*>::iterator it = nextNeuron.begin(); it != nextNeuron.end(); it++ ){
        
-       it->second.forward();
+       it->second->forward();
      }
 
     return 0;
@@ -68,6 +68,7 @@ int networkTest(){
 
   Neuron firstTestingNeuron = Neuron();
   Neuron secondTestingNeuron = Neuron();
+  Neuron thirdTestingNeuron = Neuron();
 
   firstNetwork.addNeuron(&firstTestingNeuron);
 
@@ -81,8 +82,28 @@ int networkTest(){
 
   firstNetwork.connectNeuron(&firstTestingNeuron, &secondTestingNeuron);
 
-  firstTestingNeuron.deepForward();
-  secondTestingNeuron.deepBackward();
+  firstNetwork.connectNeuron(&secondTestingNeuron, &thirdTestingNeuron);
+
+  firstNetwork.connectNeuron(&firstTestingNeuron, &thirdTestingNeuron);
+  
+
+  firstNetwork.setInputNeuron(&firstTestingNeuron);
+
+  int tempResult = firstNetwork.updateLayerStructure();
+
+  if(tempResult == 1){
+    cout << "has circle in the network structure" << endl;
+  }else{
+    cout << "no circle in the network structure" << endl;
+  }
+
+  map<long, Neuron*> allNeuronMap = firstNetwork.getAllNeuronMap();
+
+  map<long, Neuron*>::iterator it;
+
+  for(it = allNeuronMap.begin(); it != allNeuronMap.end(); it++){
+    cout << "the layer number of: " << it->second->getID() << " is: " << it->second->getLayerNumber() << endl;
+  }
 
   return 0;
 }
