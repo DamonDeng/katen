@@ -14,7 +14,7 @@ using namespace katen;
 int dictionaryTest();
 int targetTest();
 int randomTest();
-int printParameters(vector< vector<double> > inputParameters);
+int printParameters(Target testingTarget);
 
 int main(int argc, char * argv[]){
   int result = 0;
@@ -81,12 +81,11 @@ int targetTest(){
   testingTarget.connectTo(30, testingStatus);
   
 
-  vector< vector<double> > parameters = testingTarget.getInputParameters();
+  vector< double* > parameters = testingTarget.getInputParameters();
 
   cout << "the size of the parameters: " << parameters.size() << endl;
-  cout << "the size of first parameter element: " << parameters[0].size() << endl;
-
-  printParameters(testingTarget.getInputParameters());
+  
+  printParameters(testingTarget);
 
   return result;
 
@@ -109,11 +108,13 @@ int randomTest(){
   return result;  
 }
 
-int printParameters(vector< vector<double> > inputParameters){
+int printParameters(Target testingTarget){
   int result = 0;
 
+  vector< double* > inputParameters = testingTarget.getInputParameters();
+
   for(int i=0; i<inputParameters.size(); i++){
-    for(int j=0; j<inputParameters[i].size(); j++){
+    for(int j=0; j<testingTarget.statusNumber; j++){
       cout << inputParameters[i][j] << ", ";
     }
     cout << endl;

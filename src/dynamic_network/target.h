@@ -14,8 +14,10 @@ namespace katen{
 
       int connectTo(long nextTarget, vector<double> status);
 
-      vector< vector<double> > getInputParameters();
-      vector< vector<double> > getOutputParameters();
+      vector< double* > getInputParameters();
+      vector< double* > getOutputParameters();
+
+      static const int statusNumber = 10;
       
     
     private:
@@ -27,7 +29,10 @@ namespace katen{
       vector< double* > inputParameters;
       vector< double* > outputParameters;
 
-      const int statusNumber = 10;
+      
+
+      int connectToNewTarget(long nextTarget, vector<double> status);
+      int updateOldTarget(long nextTarget, vector<double> status);
 
       int positionInNextTargets(long nextTarget);
       bool isInNextTargets(long nextTarget);

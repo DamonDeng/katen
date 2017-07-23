@@ -27,37 +27,27 @@ namespace katen{
     if(isInNextTargets(nextTarget)){
       //nextTarget is in the nextTargets list, should update the parameter with BP.
       cout << "is in the next target list" << endl;
-      int position = positionInNextTargets(nextTarget);
+      
 
-      vector<double>::size_type j;
-
-      for(j=0; j<inputParameters.size(); j++){
-        inputParameters[j][position] = inputParameters[j][position] + generateInitParameter();
-      }
+      this->updateOldTarget(nextTarget, status);
 
     }else{
       //nextTarget is not in the nextTargets list, should update the nextTargets list
       //and append value to each set of parameters.
       cout << "is not in the next target list" << endl;
-      this->nextTargets.push_back(nextTarget);
+      
+      this->connectToNewTarget(nextTarget, status);
 
-      vector<double>::size_type j;
-
-      for(j=0; j<inputParameters.size(); j++){
-        this->inputParameters[j].push_back(generateInitParameter());
-      }
     }
 
     return result;
   }
 
-//connect to a target with the status.
-  //if the target is in the nextTargets list, the inputParameters should be updated with BP.
-  //if the target is not in the nextTargets list, the nextTargets list should be update.
-  //and the new value of inputParameters should be appended at the end of each set of parameters.
+  //connect to a newtarget with the status.
+  //and the new value of inputParameter should be appended at the end of inputParameters.
 
-  //the structure of the inputParameters is a two dimentions vector with double value.
-  // {{status1:{target1, target2, target3 ...}, {status2:{target1, target2, }}}
+  //the structure of the inputParameters is a vector of double array.
+  // {target1:{status1, status2, ...}, target2:{status1, status2}}
   int Target::connectToNewTarget(long nextTarget, vector<double> status){
     int result = 0;
 
@@ -65,44 +55,34 @@ namespace katen{
     double* targetParameters = new double[this->statusNumber];
     
     for(size_t i=0; i<this->statusNumber; i++){
-      double[i] = this->generateInitParameter();
+      targetParameters[i] = this->generateInitParameter();
     }
 
     this->inputParameters.push_back(vector< double* >::value_type(targetParameters));
 
-    if(isInNextTargets(nextTarget)){
-      //nextTarget is in the nextTargets list, should update the parameter with BP.
-      cout << "is in the next target list" << endl;
-      int position = positionInNextTargets(nextTarget);
+    return result;
+  }
 
-      vector<double>::size_type j;
+  //update oldarget with the status.
+  //the value of all the inputParameters should be updated based on softmax and cross entropy.
 
-      for(j=0; j<inputParameters.size(); j++){
-        inputParameters[j][position] = inputParameters[j][position] + generateInitParameter();
-      }
+  //the structure of the inputParameters is a vector of double array.
+  // {target1:{status1, status2, ...}, target2:{status1, status2}}
+  int Target::updateOldTarget(long nextTarget, vector<double> status){
+    int result = 0;
 
-    }else{
-      //nextTarget is not in the nextTargets list, should update the nextTargets list
-      //and append value to each set of parameters.
-      cout << "is not in the next target list" << endl;
-      this->nextTargets.push_back(nextTarget);
+    int position = positionInNextTargets(nextTarget);
 
-      vector<double>::size_type j;
-
-      for(j=0; j<inputParameters.size(); j++){
-        this->inputParameters[j].push_back(generateInitParameter());
-      }
-    }
+    cout << "should update the parameters with the result of position: " << position << endl;
 
     return result;
   }
 
-
-  vector< vector<double> > Target::getInputParameters(){
+  vector< double* > Target::getInputParameters(){
     return this->inputParameters;
   }
 
-  vector< vector<double> > Target::getOutputParameters(){
+  vector< double* > Target::getOutputParameters(){
     return this->outputParameters;
   }
 
