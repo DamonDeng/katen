@@ -6,15 +6,15 @@
 #include"stdlib.h"
 
 #include "dictionary.h"
-#include "target.h"
+#include "point.h"
 
 using namespace std;
 using namespace katen;
 
 int dictionaryTest();
-int targetTest();
+int pointTest();
 int randomTest();
-int printParameters(Target testingTarget);
+int printParameters(Point testingPoint);
 
 int main(int argc, char * argv[]){
   int result = 0;
@@ -24,7 +24,7 @@ int main(int argc, char * argv[]){
   
   dictionaryTest();
 
-  targetTest();
+  pointTest();
 
   //randomTest();
 
@@ -58,10 +58,10 @@ int dictionaryTest(){
 
 }
 
-int targetTest(){
+int pointTest(){
   int result = 0;
 
-  Target testingTarget = Target();
+  Point testingPoint = Point();
 
   double inputStatus[] = {1.0, 1.0, 1.0};
   vector<double> testingStatus;
@@ -73,19 +73,19 @@ int targetTest(){
   }
 
   
-  testingTarget.connectTo(10, testingStatus);
-  testingTarget.connectTo(20, testingStatus);
-  testingTarget.connectTo(10, testingStatus);
-  testingTarget.connectTo(30, testingStatus);
-  testingTarget.connectTo(30, testingStatus);
-  testingTarget.connectTo(30, testingStatus);
+  testingPoint.connectTo(10, testingStatus);
+  testingPoint.connectTo(20, testingStatus);
+  testingPoint.connectTo(10, testingStatus);
+  testingPoint.connectTo(30, testingStatus);
+  testingPoint.connectTo(30, testingStatus);
+  testingPoint.connectTo(30, testingStatus);
   
 
-  vector< double* > parameters = testingTarget.getInputParameters();
+  vector< double* > parameters = testingPoint.getInputParameters();
 
   cout << "the size of the parameters: " << parameters.size() << endl;
   
-  printParameters(testingTarget);
+  printParameters(testingPoint);
 
   return result;
 
@@ -108,13 +108,13 @@ int randomTest(){
   return result;  
 }
 
-int printParameters(Target testingTarget){
+int printParameters(Point testingPoint){
   int result = 0;
 
-  vector< double* > inputParameters = testingTarget.getInputParameters();
+  vector< double* > inputParameters = testingPoint.getInputParameters();
 
   for(int i=0; i<inputParameters.size(); i++){
-    for(int j=0; j<testingTarget.statusNumber; j++){
+    for(int j=0; j<testingPoint.statusNumber; j++){
       cout << inputParameters[i][j] << ", ";
     }
     cout << endl;

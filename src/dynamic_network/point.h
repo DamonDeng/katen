@@ -7,12 +7,12 @@ using namespace std;
 
 namespace katen{
 
-  class Target{
+  class Point{
     public:
-      Target();
-      ~Target();
+      Point();
+      ~Point();
 
-      int connectTo(long nextTarget, vector<double> status);
+      int connectTo(long nextPoint, vector<double> status);
 
       vector< double* > getInputParameters();
       vector< double* > getOutputParameters();
@@ -22,7 +22,7 @@ namespace katen{
     
     private:
 
-      vector<long> nextTargets;
+      vector<long> nextPoints;
       vector<long> inputStatus;
       vector<long> outputStatus;
 
@@ -31,13 +31,13 @@ namespace katen{
 
       
 
-      int connectToNewTarget(long nextTarget, vector<double> status);
-      int updateOldTarget(long nextTarget, vector<double> status);
+      int connectToNewPoint(long nextPoint, vector<double> status);
+      int updateOldPoint(long nextPoint, vector<double> status);
 
-      int positionInNextTargets(long nextTarget);
-      bool isInNextTargets(long nextTarget);
+      int positionInNextPoints(long nextPoint);
+      bool isInNextPoints(long nextPoint);
 
-      int addNextTarget(long nextTarget);
+      int addNextPoint(long nextPoint);
 
       double generateInitParameter();
 
