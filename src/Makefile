@@ -17,3 +17,14 @@ neural_network: neural_network/*.cpp
 neural_network_test: neural_network
 	../bin/neural_network_test
 
+dynamic_network: dynamic_network/*
+	$(CC) dynamic_network/*.cpp -o ../bin/dynamic_network_test
+
+dynamic_network_test: dynamic_network
+	../bin/dynamic_network_test
+
+math_util: math/*
+	$(CC) math/*.cpp -o ../bin/math_util_test
+
+math_util_test: math_util
+	../bin/math_util_test
