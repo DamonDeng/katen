@@ -5,6 +5,8 @@ using namespace std;
 
 namespace katen{
 
+  namespace math{
+
   Util::Util(){
 
   }
@@ -55,7 +57,7 @@ namespace katen{
     return result;
   }
 
-  double Util::dotProduct(const double inputValue[], const double weight[], size_t valueNumber){
+  double Util::dotProduct(const double inputValue[], size_t valueNumber, const double weight[]){
     double result = 0;
     for(size_t i=0; i<valueNumber; i++){
       result = result + inputValue[i]*weight[i];
@@ -63,5 +65,6 @@ namespace katen{
     return result;
   }
        
+  }
 
 }

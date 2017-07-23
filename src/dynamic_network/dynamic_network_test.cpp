@@ -1,6 +1,7 @@
 #include <iostream>
 #include <assert.h>
 #include <vector>
+#include <map>
 #include <time.h>
 
 #include"stdlib.h"
@@ -14,7 +15,10 @@ using namespace katen;
 int dictionaryTest();
 int pointTest();
 int randomTest();
+int multiplePointTest();
 int printParameters(Point testingPoint);
+int printStatus(Point testingPoint);
+
 
 int main(int argc, char * argv[]){
   int result = 0;
@@ -24,7 +28,8 @@ int main(int argc, char * argv[]){
   
   dictionaryTest();
 
-  pointTest();
+  //pointTest();
+   multiplePointTest();
 
   //randomTest();
 
@@ -64,14 +69,11 @@ int pointTest(){
   Point testingPoint = Point();
 
   double inputStatus[] = {1.0, 1.0, 1.0};
-  vector<double> testingStatus;
+  double testingStatus[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
   int arraySize = sizeof(inputStatus)/sizeof(inputStatus[0]);
 
-  for(int i=0; i<arraySize; i++){
-    testingStatus.push_back(inputStatus[i]);
-  }
-
+  
   
   testingPoint.connectTo(10, testingStatus);
   testingPoint.connectTo(20, testingStatus);
@@ -87,8 +89,56 @@ int pointTest(){
   
   printParameters(testingPoint);
 
+  printStatus(testingPoint);
+
   return result;
 
+}
+
+int multiplePointTest(){
+  int result = 0;
+
+  long inputSequence[] = {10, 20, 30, 10, 20, 30, 10, 20, 30};
+
+  double currentStatus[] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
+  
+
+  size_t inputNumber = sizeof(inputSequence)/sizeof(inputSequence[0]);
+
+  map<long, Point*> allPoints;
+  Point* p_prevPoint = NULL;
+
+  for(size_t i=0; i<inputNumber-1; i++){
+    map<long, Point*>::iterator it = allPoints.find(inputSequence[i]);
+    Point* p_currentPoint;
+    
+    if(it == allPoints.end()){
+      p_currentPoint = new Point();
+      allPoints.insert(map<long, Point*>::value_type(inputSequence[i], p_currentPoint));
+    }else{
+      p_currentPoint = allPoints[inputSequence[i]];  
+    }
+
+    p_currentPoint->connectTo(inputSequence[i+1], currentStatus);
+
+    printStatus((*p_currentPoint));
+
+    double* newStatus = p_currentPoint->getOutputStatus();
+
+    for(size_t i=0; i<Point::statusNumber; i++){
+      currentStatus[i] = newStatus[i];
+    }
+
+    if(p_prevPoint != NULL){
+      p_prevPoint->updateOutputParametersWithBP(p_currentPoint->getInputStatusGradient());
+    }
+
+    p_prevPoint = p_currentPoint;
+
+  }
+
+
+  return result;
 }
 
 int randomTest(){
@@ -111,6 +161,7 @@ int randomTest(){
 int printParameters(Point testingPoint){
   int result = 0;
 
+  cout << "print input parameters: " << endl;
   vector< double* > inputParameters = testingPoint.getInputParameters();
 
   for(int i=0; i<inputParameters.size(); i++){
@@ -119,6 +170,30 @@ int printParameters(Point testingPoint){
     }
     cout << endl;
   }
+
+  cout << "print output parameters: " << endl;
+ vector< double* > outputParameters = testingPoint.getOutputParameters();
+
+  for(int i=0; i<outputParameters.size(); i++){
+    for(int j=0; j<testingPoint.statusNumber; j++){
+      cout << outputParameters[i][j] << ", ";
+    }
+    cout << endl;
+  }
+
+  return result;
+}
+
+int printStatus(Point testingPoint){
+  int result = 0;
+
+  double* outputStatus = testingPoint.getOutputStatus();
+
+  cout << "output status: ";
+    for(int i=0; i<testingPoint.statusNumber; i++){
+      cout << outputStatus[i] << ", ";
+    }
+  cout << endl;
 
   return result;
 }

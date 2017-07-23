@@ -24,7 +24,7 @@ int main(int argc, char * argv[]){
 
   for(int iterTime=0; iterTime<totalIterTime; iterTime++){
  for(int i=0; i<3; i++){
-    fullConnectResult[i] = Util::dotProduct(inputValue, weight[i], 4);
+    fullConnectResult[i] = Util::dotProduct(inputValue, 4, weight[i]);
   }
 
 

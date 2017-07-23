@@ -1,13 +1,14 @@
 #include <iostream>
 
 #include "point.h"
+#include "dmath/util.h"
 
 using namespace std;
 
 namespace katen{
 
   Point::Point(){
-
+    this->inputStatusGradient = new double[this->statusNumber];
   } 
 
   Point::~Point(){
@@ -20,12 +21,16 @@ namespace katen{
   
   //the structure of the inputParameters is a vector of double array.
   // {point1:{status1, status2, ...}, point2:{status1, status2}}
-  int Point::connectTo(long nextPoint, vector<double> status){
+  int Point::connectTo(long nextPoint, double status[]){
     int result = 0;
+
+    for(size_t i=0; i<this->statusNumber; i++){
+      this->inputStatus[i] = status[i];
+    }
 
     if(isInNextPoints(nextPoint)){
       //nextPoint is in the nextPoints list, should update the parameter with BP.
-      cout << "is in the next point list" << endl;
+      //cout << "is in the next point list" << endl;
       
 
       this->updateOldPoint(nextPoint, status);
@@ -33,11 +38,14 @@ namespace katen{
     }else{
       //nextPoint is not in the nextPoints list, should update the nextPoints list
       //and append value to each set of parameters.
-      cout << "is not in the next point list" << endl;
+      //cout << "is not in the next point list" << endl;
       
       this->connectToNewPoint(nextPoint, status);
+      this->updateOldPoint(nextPoint, status);
 
     }
+
+    updateOutputStatus();
 
     return result;
   }
@@ -47,17 +55,22 @@ namespace katen{
 
   //the structure of the inputParameters is a vector of double array.
   // {point1:{status1, status2, ...}, point2:{status1, status2}}
-  int Point::connectToNewPoint(long nextPoint, vector<double> status){
+  int Point::connectToNewPoint(long nextPoint, double status[]){
     int result = 0;
 
     this->nextPoints.push_back(nextPoint);
-    double* pointParameters = new double[this->statusNumber];
+    
+    double* pointInputParameters = new double[this->statusNumber];
+    double* pointOutputParameters = new double[this->statusNumber];
     
     for(size_t i=0; i<this->statusNumber; i++){
-      pointParameters[i] = this->generateInitParameter();
+      pointInputParameters[i] = this->generateInitParameter();
+      pointOutputParameters[i] = this->generateInitParameter();
     }
 
-    this->inputParameters.push_back(vector< double* >::value_type(pointParameters));
+    this->inputParameters.push_back(vector< double* >::value_type(pointInputParameters));
+    this->outputParameters.push_back(vector< double* >::value_type(pointOutputParameters));
+    this->hiddenLayerValue.push_back(vector<double>::value_type(0));
 
     return result;
   }
@@ -67,14 +80,106 @@ namespace katen{
 
   //the structure of the inputParameters is a vector of double array.
   // {point1:{status1, status2, ...}, point2:{status1, status2}}
-  int Point::updateOldPoint(long nextPoint, vector<double> status){
+  int Point::updateOldPoint(long nextPoint, double status[]){
     int result = 0;
 
-    int position = positionInNextPoints(nextPoint);
+    int rightPosition = positionInNextPoints(nextPoint);
 
-    cout << "should update the parameters with the result of position: " << position << endl;
+    cout << "should update the parameters with the result of position: " << rightPosition << endl;
+    size_t nextPointNumber = this->nextPoints.size();
+
+    double softmaxInput[nextPointNumber];
+    double softmaxOutput[nextPointNumber];
+
+    double gradient[nextPointNumber];
+    
+    //compute the value of all the next points:
+    for(size_t i=0; i<nextPointNumber; i++){
+      softmaxInput[i] = math::Util::dotProduct(status, this->statusNumber, this->inputParameters[i]);
+      this->hiddenLayerValue[i] = softmaxInput[i];
+    }
+    
+    math::Util::softmax(softmaxInput, nextPointNumber, softmaxOutput);
+
+    for(size_t i=0; i<nextPointNumber; i++){
+      cout << "softmax" << i << ": " << softmaxOutput[i] << endl;
+    }
+
+    math::Util::softmaxCrossEntropyBP(softmaxOutput, nextPointNumber, gradient, rightPosition);
+
+    for(size_t i=0; i<nextPointNumber; i++){
+      cout << "gradient" << i << ": " << gradient[i] << endl;
+    }
+
+    //clear old gradient of inputStatus:
+    for(size_t i=0; i<this->statusNumber; i++){
+      this->inputStatusGradient[i] = 0;
+    }
+
+    for(size_t i=0; i<nextPointNumber; i++){
+      for(size_t j=0; j<this->statusNumber; j++){
+        //comput currentGradient for weight current connection from inputStatus to hidden layer:
+        double currentGradient = gradient[i]*status[j];
+
+        //update inputParameters for gradient decent:
+        this->inputParameters[i][j] = this->inputParameters[i][j] - currentGradient;
+
+        //accumulate gradient for all the inputStatus, for BP to prev point:
+        this->inputStatusGradient[j] = this->inputStatusGradient[j] + currentGradient;
+      }
+    }
 
     return result;
+  }
+
+  int Point::updateOutputStatus(){
+    int result = 0;
+
+    size_t nextPointNumber = this->nextPoints.size();
+
+    double hiddenLayer[nextPointNumber];
+    
+    
+    for(size_t i=0; i<nextPointNumber; i++){
+      hiddenLayer[i] = math::Util::dotProduct(this->inputStatus, this->statusNumber, this->inputParameters[i]);
+    }
+
+    double tempParameters[nextPointNumber];
+
+    for(size_t s=0; s<this->statusNumber; s++){
+
+     for(size_t i=0; i<nextPointNumber; i++){
+        tempParameters[i] = this->outputParameters[i][s];
+        this->outputStatus[s] = math::Util::dotProduct(hiddenLayer, nextPointNumber, tempParameters);
+      } 
+    }
+
+    return result;
+
+  }
+
+  int Point::updateOutputParametersWithBP(double* outputStatusGradient){
+    int result = 0;
+
+    size_t nextPointNumber = this->nextPoints.size();
+
+    for(size_t i=0; i<this->statusNumber; i++){
+      for(size_t j=0; j<nextPointNumber; j++){
+        double currentGradient = outputStatusGradient[i]*this->hiddenLayerValue[j];
+        this->outputParameters[j][i] = this->outputParameters[j][i] - currentGradient;
+      }
+    }
+    
+    return result;
+
+  }
+
+  double* Point::getOutputStatus(){
+    return this->outputStatus;
+  }
+
+  double* Point::getInputStatusGradient(){
+    return this->inputStatusGradient;
   }
 
   vector< double* > Point::getInputParameters(){
