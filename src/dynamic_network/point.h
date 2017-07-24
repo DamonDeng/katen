@@ -12,13 +12,15 @@ namespace katen{
       Point(long ID);
       ~Point();
 
+      long getID();
+
       int connectTo(long nextPoint, double status[]);
 
       vector< double* > getInputParameters();
       vector< double* > getOutputParameters();
 
-      double* getOutputStatus();
-      double* getInputStatusGradient();
+      vector<double> getOutputStatus();
+      vector<double> getInputStatusGradient();
 
       int updateOutputParametersWithBP(double* outputStatusGradient);
 
@@ -37,7 +39,7 @@ namespace katen{
       vector< double* > inputParameters;
       vector< double* > outputParameters;
 
-      double* inputStatusGradient;
+      vector<double> inputStatusGradient;
       vector<double> hiddenLayerValue;
 
       int connectToNewPoint(long nextPoint, double status[]);

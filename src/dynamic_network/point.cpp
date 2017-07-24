@@ -10,11 +10,15 @@ namespace katen{
 
   Point::Point(long ID){
     this->ID = ID;
-    this->inputStatusGradient = new double[this->statusNumber];
+   
   } 
 
   Point::~Point(){
     //Todo, remember to delete all the parameters.
+  }
+
+  long Point::getID(){
+    return this->ID;
   }
 
   //connect to a point with the status.
@@ -121,8 +125,10 @@ namespace katen{
     cout << endl;
 
     //clear old gradient of inputStatus:
+    this->inputStatusGradient.clear();
     for(size_t i=0; i<this->statusNumber; i++){
-      this->inputStatusGradient[i] = 0;
+      this->inputStatusGradient.push_back(vector<double>::value_type(0));
+      
     }
 
     cout << "updating parameter: " << endl;
@@ -233,13 +239,22 @@ namespace katen{
     return result;
   }
 
-  double* Point::getOutputStatus(){
-    return this->outputStatus;
+  vector<double> Point::getOutputStatus(){
+    vector<double> result;
+    for(size_t i=0; i<Point::statusNumber; i++){
+      result.push_back(vector<double>::value_type(this->outputStatus[i]));
+    }
+    return result;
   }
 
-  double* Point::getInputStatusGradient(){
-    cout << "getting inputStatusGradient, the first element is: " << this->inputStatusGradient[0] << endl;
-    return this->inputStatusGradient;
+  vector<double> Point::getInputStatusGradient(){
+    //cout << "getting inputStatusGradient, the first element is: " << this->inputStatusGradient[0] << endl;
+    vector<double> result;
+    for(size_t i=0; i<Point::statusNumber; i++){
+      result.push_back(vector<double>::value_type(this->inputStatusGradient[i]));
+    }
+    return result;
+    
   }
 
   vector< double* > Point::getInputParameters(){
