@@ -1,5 +1,7 @@
 #include "util.h"
 #include <cmath>
+#include <time.h>
+#include <random>
 
 using namespace std;
 
@@ -64,7 +66,16 @@ namespace katen{
     }
     return result;
   }
-       
+  
+  // double Util::randomDouble(double min, double max){
+   
+  //   double result = dis(random);
+  //   return result;
+    
+  // }
+
+
   }
 
+ 
 }

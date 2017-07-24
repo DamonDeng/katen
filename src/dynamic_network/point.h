@@ -9,7 +9,7 @@ namespace katen{
 
   class Point{
     public:
-      Point();
+      Point(long ID);
       ~Point();
 
       int connectTo(long nextPoint, double status[]);
@@ -22,11 +22,14 @@ namespace katen{
 
       int updateOutputParametersWithBP(double* outputStatusGradient);
 
+      long predictNextPoint(double* status);
+
       static const int statusNumber = 10;
       
     
     private:
-
+      long ID;
+      
       vector<long> nextPoints;
       double inputStatus[statusNumber];
       double outputStatus[statusNumber];

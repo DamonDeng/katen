@@ -2,12 +2,14 @@
 
 #include "point.h"
 #include "dmath/util.h"
+#include "dmath/random_factory.h"
 
 using namespace std;
 
 namespace katen{
 
-  Point::Point(){
+  Point::Point(long ID){
+    this->ID = ID;
     this->inputStatusGradient = new double[this->statusNumber];
   } 
 
@@ -23,6 +25,9 @@ namespace katen{
   // {point1:{status1, status2, ...}, point2:{status1, status2}}
   int Point::connectTo(long nextPoint, double status[]){
     int result = 0;
+
+    cout << "::::::Point " << this->ID << " Connecting to: " << nextPoint ;
+    cout << "-------------------------------------------" << endl;
 
     for(size_t i=0; i<this->statusNumber; i++){
       this->inputStatus[i] = status[i];
@@ -101,20 +106,26 @@ namespace katen{
     
     math::Util::softmax(softmaxInput, nextPointNumber, softmaxOutput);
 
+    cout << "softmax: " ;
     for(size_t i=0; i<nextPointNumber; i++){
-      cout << "softmax" << i << ": " << softmaxOutput[i] << endl;
+      cout << "  " << softmaxOutput[i];
     }
+    cout << endl;
 
     math::Util::softmaxCrossEntropyBP(softmaxOutput, nextPointNumber, gradient, rightPosition);
 
+    cout << "gradient: " ;
     for(size_t i=0; i<nextPointNumber; i++){
-      cout << "gradient" << i << ": " << gradient[i] << endl;
+      cout << "  " << gradient[i];
     }
+    cout << endl;
 
     //clear old gradient of inputStatus:
     for(size_t i=0; i<this->statusNumber; i++){
       this->inputStatusGradient[i] = 0;
     }
+
+    cout << "updating parameter: " << endl;
 
     for(size_t i=0; i<nextPointNumber; i++){
       for(size_t j=0; j<this->statusNumber; j++){
@@ -122,12 +133,23 @@ namespace katen{
         double currentGradient = gradient[i]*status[j];
 
         //update inputParameters for gradient decent:
+        //cout << " " << this->inputParameters[i][j] << "(-" << currentGradient << ") "; 
         this->inputParameters[i][j] = this->inputParameters[i][j] - currentGradient;
-
+        
+        cout << " [" << this->inputStatusGradient[j] << " (+" << currentGradient << ")]  ";
         //accumulate gradient for all the inputStatus, for BP to prev point:
         this->inputStatusGradient[j] = this->inputStatusGradient[j] + currentGradient;
+
       }
+      cout << endl;
     }
+
+    cout << "after updating inpuStatusGradient: " << this->inputStatusGradient[0] << endl;
+
+    for(int i=0; i<Point::statusNumber; i++){
+      cout << " " << this->inputStatusGradient[i];
+    }
+    cout << endl;
 
     return result;
   }
@@ -162,16 +184,53 @@ namespace katen{
     int result = 0;
 
     size_t nextPointNumber = this->nextPoints.size();
-
+    cout << "Updaeting output_parameters of: " << this->ID << endl;
     for(size_t i=0; i<this->statusNumber; i++){
       for(size_t j=0; j<nextPointNumber; j++){
+        //cout << "h(" << this->hiddenLayerValue[j] << ")* g(" << outputStatusGradient[i] << ") ";
         double currentGradient = outputStatusGradient[i]*this->hiddenLayerValue[j];
+        //cout << " " << this->outputParameters[j][i] << " (-" << currentGradient << ") ";
         this->outputParameters[j][i] = this->outputParameters[j][i] - currentGradient;
       }
     }
+    cout << endl;
     
     return result;
 
+  }
+
+  long Point::predictNextPoint(double* status){
+    long result = 0;
+
+    size_t nextPointNumber = this->nextPoints.size();
+
+    double softmaxInput[nextPointNumber];
+    double softmaxOutput[nextPointNumber];
+
+    
+    //compute the value of all the next points:
+    for(size_t i=0; i<nextPointNumber; i++){
+      softmaxInput[i] = math::Util::dotProduct(status, this->statusNumber, this->inputParameters[i]);
+      this->hiddenLayerValue[i] = softmaxInput[i];
+    }
+    
+    math::Util::softmax(softmaxInput, nextPointNumber, softmaxOutput);
+
+    double maxValue = 0;
+    size_t maxPosition = 0;
+
+    for(size_t i=0; i<nextPointNumber; i++){
+      if(softmaxOutput[i] > maxValue){
+        maxValue = softmaxOutput[i];
+        maxPosition = i;
+      }
+    }
+    
+    result = this->nextPoints[maxPosition];
+
+    updateOutputStatus();
+
+    return result;
   }
 
   double* Point::getOutputStatus(){
@@ -179,6 +238,7 @@ namespace katen{
   }
 
   double* Point::getInputStatusGradient(){
+    cout << "getting inputStatusGradient, the first element is: " << this->inputStatusGradient[0] << endl;
     return this->inputStatusGradient;
   }
 
@@ -222,7 +282,7 @@ namespace katen{
   }
 
   double Point::generateInitParameter(){
-    return 0.01;
+    return math::RandomFactory::getNext();
   }
 
 }
