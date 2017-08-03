@@ -13,19 +13,43 @@ namespace katen{
 
   }
 
-  int Util::softmax(const double inputValue[], size_t valueNumber, double resultValue[]){
-    int result = 0;
+  vector<double> Util::softmax(vector<double> inputValue){
+    vector<double> result;
 
-    double expValue[valueNumber];
-    double sumValue=0;
+    double maxValue = 1;
+    double absValue = 0;
 
-    for(size_t i=0; i<valueNumber; i++){
-      expValue[i] = exp(inputValue[i]);
-      sumValue = sumValue + expValue[i];
+    for(size_t i=0; i<inputValue.size(); i++){
+      absValue = fabs(inputValue[i]);  
+      if(maxValue < absValue){
+        maxValue = absValue;
+      }
     }
 
-    for(size_t i=0; i<valueNumber; i++){
-      resultValue[i] = expValue[i]/sumValue;
+    
+  
+
+    vector<double> expValue;
+    double sumValue=0;
+
+    for(size_t i=0; i<inputValue.size(); i++){
+      double tempExpValue = exp(inputValue[i] / maxValue);
+      if(tempExpValue!=tempExpValue){
+        cout << "found NAN: input value is: " << inputValue[i] << endl;
+      }
+      expValue.push_back(vector<double>::value_type(tempExpValue));
+      sumValue = sumValue + tempExpValue;
+    }
+
+    //cout << " tempDivValue:" << endl;
+    for(size_t i=0; i<inputValue.size(); i++){
+      double tempDivValue = expValue[i]/sumValue;
+      
+      if(tempDivValue!=tempDivValue){
+        cout << "found NAN while diving: exp value is: " << expValue[i] << " sumValue is:" << sumValue << endl;
+      }
+      //cout << " " << tempDivValue;
+      result.push_back(vector<double>::value_type(tempDivValue));
       
     }
     
@@ -45,14 +69,14 @@ namespace katen{
     return result;
   }
 
-  int Util::softmaxCrossEntropyBP(const double softmaxOutput[], size_t valueNumber, double gradient[], long rightPosition){
-    int result = 0;
+  vector<double> Util::softmaxCrossEntropyBP(const vector<double> softmaxOutput, long rightPosition){
+    vector<double> result;
 
-    for(size_t i=0; i<valueNumber; i++){
+    for(size_t i=0; i<softmaxOutput.size(); i++){
       if(i == rightPosition){
-        gradient[i] = softmaxOutput[i]-1;
+        result.push_back(vector<double>::value_type(softmaxOutput[i]-1));
       }else{
-        gradient[i] = softmaxOutput[i];
+        result.push_back(vector<double>::value_type(softmaxOutput[i]));
       }
     }
 
@@ -62,6 +86,14 @@ namespace katen{
   double Util::dotProduct(const double inputValue[], size_t valueNumber, const double weight[]){
     double result = 0;
     for(size_t i=0; i<valueNumber; i++){
+      result = result + inputValue[i]*weight[i];
+    }
+    return result;
+  }
+
+  double Util::dotProduct(const vector<double> inputValue, const vector<double> weight){
+    double result = 0;
+    for(size_t i=0; i<inputValue.size() && i<weight.size(); i++){
       result = result + inputValue[i]*weight[i];
     }
     return result;

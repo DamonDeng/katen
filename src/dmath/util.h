@@ -13,12 +13,14 @@ namespace math{
   class Util{
     public:
       Util();
-      static int softmax(const double inputValue[], size_t valueNumber, double resultValue[]);
+      static vector<double> softmax(vector<double> inputValue);
       static double crossEntropy(const double inputValue[], size_t valueNumber, double labelValue[]);
-      static int softmaxCrossEntropyBP(const double softmaxOutput[], size_t valueNumber, double gradient[], long rightPosition);
+      static vector<double> softmaxCrossEntropyBP(vector<double> softmaxOutput, long rightPosition);
       static double dotProduct(const double inputValue[], size_t valueNumber, const double weight[]);
+      static double dotProduct(vector<double> inputValue, const vector<double> weight);
+      
       //static int dotProductBP(const double inputValue[], double gradient[]);
-      static double randomDouble(double min, double max);
+      //static double randomDouble(double min, double max);
 
     private:
 

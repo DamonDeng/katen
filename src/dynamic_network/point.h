@@ -1,7 +1,8 @@
-#ifndef DAMONDENG_KATEN_TARGET
-#define DAMONDENG_KATEN_TARGET
+#ifndef DAMONDENG_KATEN_POINT
+#define DAMONDENG_KATEN_POINT
 
 #include <vector>
+#include <sstream>
 
 using namespace std;
 
@@ -11,39 +12,43 @@ namespace katen{
     public:
       Point(long ID);
       ~Point();
+      Point(const Point& point);
 
       long getID();
 
-      int connectTo(long nextPoint, double status[]);
+      int connectTo(long nextPoint, vector<double> status);
 
-      vector< double* > getInputParameters();
-      vector< double* > getOutputParameters();
+      vector< vector<double> > getInputParameters();
+      vector< vector<double> > getOutputParameters();
 
       vector<double> getOutputStatus();
       vector<double> getInputStatusGradient();
 
-      int updateOutputParametersWithBP(double* outputStatusGradient);
+      int updateStatusParametersWithBP(vector<double> outputStatusGradient);
 
-      long predictNextPoint(double* status);
+      long predictNextPoint(vector<double> status);
 
-      static const int statusNumber = 10;
-      
+      string getReportInformation();
+
+      static const double stepSize;
+
+    
     
     private:
       long ID;
       
       vector<long> nextPoints;
-      double inputStatus[statusNumber];
-      double outputStatus[statusNumber];
+      vector<double> inputStatus;
+      vector<double> outputStatus;
 
-      vector< double* > inputParameters;
-      vector< double* > outputParameters;
+      vector< vector<double> > inputParameters;
+      vector< vector<double> > outputParameters;
 
       vector<double> inputStatusGradient;
       vector<double> hiddenLayerValue;
 
-      int connectToNewPoint(long nextPoint, double status[]);
-      int updateOldPoint(long nextPoint, double status[]);
+      int connectToNewPoint(long nextPoint, vector<double> status);
+      int updateOldPoint(long nextPoint, vector<double> status);
 
       int updateOutputStatus();
 

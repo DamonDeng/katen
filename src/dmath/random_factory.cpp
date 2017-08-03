@@ -9,7 +9,7 @@ namespace math{
   RandomFactory* RandomFactory::instance;
 
   std::default_random_engine RandomFactory::random(time(NULL));  
-  std::uniform_real_distribution<double> RandomFactory::dis(-1.0, 1.0);  
+  std::uniform_real_distribution<double> RandomFactory::dis(-2.0, 2.0);  
    
 
   RandomFactory* RandomFactory::getInstance(){
@@ -45,6 +45,7 @@ namespace math{
 
   double RandomFactory::getNext(){
     return dis(random);
+    
   }
 
 
